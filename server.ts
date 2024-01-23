@@ -1,10 +1,16 @@
-import { express } from "./deps.ts";
+import { Application, Router } from './deps.ts';
 
-const app = express();
+const port = 8000;
+const app = new Application();
 
-app.get("/", async (req, res) => {
+const router = new Router();
 
-  const resp = await fetch("https://raw.githubusercontent.com/penggguna/QuranJSON/master/surah/1.json", {
+router.get('/', async ({ response, request }) => {
+
+  const juz = request.url.searchParams.get('juz');
+  console.log(juz);
+
+  const resp = await fetch(`https://raw.githubusercontent.com/penggguna/QuranJSON/master/surah/${juz ?? 1}.json`, {
     // The init object here has an headers object containing a
     // header that indicates what type of response we accept.
     // We're not specifying the method field since by default
@@ -16,11 +22,32 @@ app.get("/", async (req, res) => {
 
   const data = await resp.json();
 
-  res.status(200).json(data);
+
+  response.status = 200
+  response.headers.set("Content-Type", "application/json") // set to html if you want
+  response.body = {
+    data
+  }
 });
 
-app.listen(8000, () => {
-  console.log("server run on http://localhost:8000");
+
+router.post('/', (ctx) => {
+  ctx.response.body = 'Received a POST HTTP method';
 });
 
-//deno run -A server.ts
+router.put('/', (ctx) => {
+  ctx.response.body = 'Received a PUT HTTP method';
+});
+
+router.delete('/', (ctx) => {
+  ctx.response.body = 'Received a DELETE HTTP method';
+});
+
+app.use(router.allowedMethods());
+app.use(router.routes());
+
+app.addEventListener('listen', () => {
+  console.log(`Listening on: localhost:${port}`);
+});
+
+await app.listen({ port });
