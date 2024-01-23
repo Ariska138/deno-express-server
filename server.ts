@@ -4,7 +4,7 @@ const app = express();
 
 app.get("/", async (req, res) => {
 
-  const resp = await fetch("https://raw.githubusercontent.com/penggguna/QuranJSON/master/surah/2.json", {
+  const resp = await fetch("https://raw.githubusercontent.com/penggguna/QuranJSON/master/surah/1.json", {
     // The init object here has an headers object containing a
     // header that indicates what type of response we accept.
     // We're not specifying the method field since by default
